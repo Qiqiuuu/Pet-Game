@@ -1,0 +1,21 @@
+class Animal:
+    def __init__(self, x, y, hungerSpeed, boredomSpeed):
+        self.boredom = 100
+        self.food = 100
+        self.x = x
+        self.y = y
+        self.hungerSpeed = hungerSpeed
+        self.boredomSpeed = boredomSpeed
+
+    def Feed(self):
+        pass
+
+    def Pet(self):
+        pass
+
+    def CheckBoredomAndFood(self):
+        return self.boredom > 0 or self.food > 0
+
+    def ReduceBoredomAndFood(self):
+        self.boredom -= self.boredomSpeed
+        self.food -= self.hungerSpeed
