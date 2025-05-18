@@ -7,6 +7,7 @@ from Slider import Slider
 from Button import Button
 import Animals
 
+
 class Menu:
     def __init__(self, game):
         self.game = game
@@ -63,28 +64,29 @@ class Menu:
             button.Draw(screen)
 
     def CreateButtonGrid(self):
-        buttonWidth = self.width*0.15
-        buttonHeight = self.height*0.1
+        buttonWidth = self.width * 0.15
+        buttonHeight = self.height * 0.1
         buttonSpacingX = buttonWidth // 5
         buttonSpacingY = buttonWidth // 5
 
-        gridWidth = 2*buttonWidth+buttonSpacingX
-        gridHeight = 2*buttonHeight+buttonSpacingY
+        gridWidth = 2 * buttonWidth + buttonSpacingX
+        gridHeight = 2 * buttonHeight + buttonSpacingY
 
-        gridX = self.width/2 - gridWidth/2
-        gridY = self.height/2 - gridHeight/2 + self.height*0.25
+        gridX = (self.width - gridWidth) / 2
+        gridY = (self.height - gridHeight) / 2 + self.height*0.25
 
         button_texts = ["Cow", "Cat", "Frog", "Blob fish"]
-        actions = [lambda: self.game.SetPet(Cow()),
-                   lambda: self.game.SetPet(Cow()),
-                   lambda: self.game.SetPet(Frog()),
-                   lambda: self.game.SetPet(BlobFish())]
+        actions = [lambda: self.game.SetPet(
+            Cow(self.width / 2, self.height * 0.5, self.foodSlider.GetValue(), self.boredomSlider.GetValue())),
+                   lambda: self.game.SetPet(Cow(self.width / 2, self.height * 0.7, self.foodSlider.GetValue(), self.boredomSlider.GetValue())),
+                   lambda: self.game.SetPet(Frog(self.width / 2, self.height * 0.6, self.foodSlider.GetValue(), self.boredomSlider.GetValue())),
+                   lambda: self.game.SetPet(BlobFish(self.width / 2, self.height * 0.6, self.foodSlider.GetValue(), self.boredomSlider.GetValue()))]
         buttonIndex = 0
 
         for row in range(2):
             for col in range(2):
-                x = gridX + col * (buttonWidth + buttonSpacingX)
-                y = gridY + row * (buttonHeight + buttonSpacingY)
+                x = gridX + col * (buttonWidth + buttonSpacingX) + buttonWidth / 2
+                y = gridY + row * (buttonHeight + buttonSpacingY) + buttonHeight / 2
                 button = Button(x, y, buttonWidth, buttonHeight, button_texts[buttonIndex], actions[buttonIndex])
                 self.buttons.append(button)
                 buttonIndex += 1
