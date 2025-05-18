@@ -2,6 +2,7 @@ from Menu import Menu
 import pygame
 from Animals import Animal
 from Bar import Bar
+from Button import Button
 
 
 class Game:
@@ -15,9 +16,9 @@ class Game:
         self.running = True
         self.background = pygame.transform.scale(pygame.image.load("Assets/Background/summer 2/Summer2.png"),
                                                  (self.width, self.height))
-        self.bars = [Bar("Assets/Boredom Bar/Boredom Bar_", self.width * 0.01, self.height * 0.01, self.width * 0.2,
+        self.bars = [Bar("Assets/Boredom Bar/Boredom Bar_", self.width * 0.01, self.height * 0.01, self.width * 0.23,
                          self.height * 0.12),
-                     Bar("Assets/Food Bar/Food Bar_", self.width * 0.01, self.height * 0.14, self.width * 0.2,
+                     Bar("Assets/Food Bar/Food Bar_", self.width * 0.01, self.height * 0.14, self.width * 0.23,
                          self.height * 0.12)]
 
         self.menuActive = None
@@ -31,13 +32,20 @@ class Game:
         self.fadeStartTime = 0
         self.nextAction = None
         self.afterUpdateBars = False
+        self.buttons = [Button(self.width / 2 + self.width * 0.2, self.height * 0.9, self.width * 0.2,
+                        self.height * 0.1, "Feed", lambda: self.pet.Feed()),
+                        Button(self.width / 2 - self.width * 0.2, self.height * 0.9, self.width * 0.2,
+                        self.height * 0.1, "Pet", lambda: self.pet.Pet())]
 
     def Events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            for button in self.buttons:
+                button.HandleEvent(event)
             if self.menuActive:
                 self.menu.HandleEvent(event)
+
 
     def Draw(self):
         if self.menuActive:
@@ -47,6 +55,10 @@ class Game:
             if self.afterUpdateBars is True:
                 for bar in self.bars:
                     bar.Draw(self.screen)
+            if self.pet.innit:
+                self.pet.Draw(self.screen)
+            for button in self.buttons:
+                button.Draw(self.screen)
         if self.fading:
             fadeSurface = pygame.Surface((self.width, self.height))
             fadeSurface.fill((0, 0, 0))
@@ -61,6 +73,7 @@ class Game:
             for bar, value in zip(self.bars, [self.pet.boredom, self.pet.food]):
                 bar.Update(value)
             self.afterUpdateBars = True
+            self.pet.Update(self.screen)
         if self.fading:
             currentTime = pygame.time.get_ticks()
             elapsedTime = currentTime - self.fadeStartTime
