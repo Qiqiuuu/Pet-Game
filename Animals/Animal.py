@@ -58,10 +58,10 @@ class Animal(pygame.sprite.Sprite):
                 self.boredom += 10
 
     def CheckBoredomAndFood(self):
-        return self.boredom > 0 or self.food > 0
+        return self.boredom > 0 and self.food > 0
 
     def ReduceBoredomAndFood(self):
-        self.boredom -= self.boredomSpeed * 0.0005
+        self.boredom -= self.boredomSpeed * 0.01
         self.food -= self.hungerSpeed * 0.0005
 
     def Update(self, screen):
