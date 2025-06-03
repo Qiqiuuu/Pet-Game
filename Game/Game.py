@@ -1,9 +1,10 @@
+from ButtonIMG import ButtonIMG
 from Menu import Menu
 import pygame
 from Animals import Animal
 from Bar import Bar
-from Button import Button
 from End import End
+
 
 
 class Game:
@@ -11,41 +12,60 @@ class Game:
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode((self.width, self.height))
+
         pygame.display.set_caption(title)
         pygame.init()
         pygame.mixer.init()
+
         self.clock = pygame.time.Clock()
         self.running = True
-        self.background = pygame.transform.scale(pygame.image.load("Assets/Background/summer 2/Summer2.png"),
-                                                 (self.width, self.height))
-        self.bars = [Bar("Assets/Boredom Bar/Boredom Bar_", self.width * 0.01, self.height * 0.02, self.width * 0.23,
-                         self.height * 0.12),
-                     Bar("Assets/Food Bar/Food Bar_", self.width * 0.01, self.height * 0.14, self.width * 0.23,
-                         self.height * 0.12)]
-
         self.menuActive = None
         self.gameActive = None
-        self.menu = Menu(self)
+        self.endActive = False
         self.pet = None
-        self.fadeAlpha = 0
-        self.fading = False
-        self.fadeIn = False
-        self.fadeDuration = 1500
-        self.fadeStartTime = 0
         self.nextAction = None
         self.afterUpdateBars = False
-        self.buttons = [Button(self.width / 2 + self.width * 0.2, self.height * 0.9, self.width * 0.2,
-                               self.height * 0.1, "Feed", lambda: self.pet.Feed(),
-                               image="Assets/button.png",
-                               imageHigh="Assets/button_highlighted.png"),
-                        Button(self.width / 2 - self.width * 0.2, self.height * 0.9, self.width * 0.2,
-                               self.height * 0.1, "Pet", lambda: self.pet.Pet(),
-                               image="Assets/button.png",
-                               imageHigh="Assets/button_highlighted.png")]
-        self.endActive = False
+
         self.end = End(self)
+        self.menu = Menu(self)
+
         self.deathSound = pygame.mixer.Sound("Assets/Dark Souls - You Died.mp3")
         self.deathSound.set_volume(0.02)
+
+        self.fadeAlpha = 0
+        self.fadeDuration = 1500
+        self.fadeStartTime = 0
+        self.fading = False
+        self.fadeIn = False
+
+        self.barHeightMP = 0.12
+        self.barWidthMP = 0.23
+        self.barXMP = 0.01
+
+        self.buttonXMP = 0.2
+        self.buttonYMP = 0.9
+        self.buttonHeightMP = 0.1
+        self.buttonWidthMP = 0.2
+
+        self.background = pygame.transform.scale(pygame.image.load("Assets/Background/summer 2/Summer2.png"),
+                                                 (self.width, self.height))
+        self.bars = [Bar("Assets/Boredom Bar/Boredom Bar_", self.width * self.barXMP, self.height * 0.02,
+                         self.width * self.barWidthMP,
+                         self.height * self.barHeightMP),
+                     Bar("Assets/Food Bar/Food Bar_", self.width * self.barXMP, self.height * 0.14,
+                         self.width * self.barWidthMP,
+                         self.height * self.barHeightMP)]
+
+        self.buttons = [ButtonIMG(self.width / 2 + self.width * self.buttonXMP, self.height * self.buttonYMP,
+                                  self.width * self.buttonWidthMP,
+                                  self.height * self.buttonHeightMP, "Feed", lambda: self.pet.Feed(),
+                                  image="Assets/button.png",
+                                  imageHigh="Assets/button_highlighted.png"),
+                        ButtonIMG(self.width / 2 - self.width * self.buttonXMP, self.height * self.buttonYMP,
+                                  self.width * self.buttonWidthMP,
+                                  self.height * self.buttonHeightMP, "Pet", lambda: self.pet.Pet(),
+                                  image="Assets/button.png",
+                                  imageHigh="Assets/button_highlighted.png")]
 
     def Events(self):
         for event in pygame.event.get():
@@ -66,7 +86,7 @@ class Game:
             if self.afterUpdateBars is True:
                 for bar in self.bars:
                     bar.Draw(self.screen)
-            if self.pet.innit:
+            if self.pet.init:
                 self.pet.Draw(self.screen)
             for button in self.buttons:
                 button.Draw(self.screen)
