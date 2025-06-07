@@ -4,7 +4,35 @@ from Animals.Action import Action
 
 
 class Animal(pygame.sprite.Sprite):
-    def __init__(self, x, y, hungerSpeed, boredomSpeed, animations, startingAnimation, animationPet):
+    """
+    Klasa Animal reprezentuje ogólne zachowanie i właściwości zwierzaka
+    w grze, takie jak głód, nuda, ruch, animacje oraz interakcje.
+    Dziedziczy po `pygame.sprite.Sprite` dla łatwiejszego zarządzania w grupach sprite'ów.
+        """
+    def __init__(self, x: float, y: float, hungerSpeed: float, boredomSpeed: float, animations: dict,
+                 startingAnimation: str, animationPet: dict):
+        """
+        Ładuje i przygotowuje wszystkie animacje zwierzaka, ustawia początkowe statystyki,
+        i konfiguruje jego zachowanie ruchowe.
+
+        :param x: Początkowa pozycja X (horyzontalna) środka zwierzaka.
+        :type x: int
+        :param y: Początkowa pozycja Y (wertykalna) środka zwierzaka.
+        :type y: int
+        :param hungerSpeed: Szybkość, z jaką zwierzak traci głód.
+        :type hungerSpeed: float
+        :param boredomSpeed: Szybkość, z jaką zwierzak traci nudę.
+        :type boredomSpeed: float
+        :param animations: Słownik zawierający ścieżki do klatek animacji.
+                           Kluczem jest nazwa animacji (np. "idle", "eat"), wartością lista ścieżek.
+        :type animations: dict
+        :param startingAnimation: Klucz słownika `animations` wskazujący animację początkową.
+        :type startingAnimation: str
+        :param animationPet: Słownik zawierający listę nazw animacji dla różnych stanów (np. "idle", "move").
+                             Używany do losowego wyboru animacji.
+        :type animationPet: dict
+        """
+
         self.innit = False
         super().__init__()
         self.boredom = 100
@@ -47,13 +75,28 @@ class Animal(pygame.sprite.Sprite):
 
         self.init = True
 
-    def AnimationsToSurface(self, animationData):
+    def AnimationsToSurface(self, animationData: dict) -> dict:
+        """
+        Ładuje wszystkie grafiki animacji z podanych ścieżek do powierzchni Pygame.
+
+        :param animationData: Słownik, gdzie kluczem jest nazwa animacji, a wartością lista ścieżek do klatek.
+        :type animationData: dict
+
+        :returns: Słownik zawierający nazwy animacji jako klucze i listy załadowanych powierzchni Pygame jako wartości.
+        :rtype: dict[str, list[pygame.Surface]]
+        """
         loadedAnims = {}
         for key, paths in animationData.items():
             loadedAnims[key] = [pygame.image.load(path).convert_alpha() for path in paths]
         return loadedAnims
 
     def Feed(self):
+        """
+        Rozpoczyna akcję karmienia zwierzaka.
+
+        Ustawia animację "eat", zwiększa poziom głodu o 10 i inicjuje animację butelek/jedzenia.
+        Akcja jest wykonywana tylko, jeśli zwierzak nie jest już w innej akcji.
+        """
         if not self.inAction:
             self.inAction = True
             self.currentAnimationKey = "eat"
@@ -65,6 +108,12 @@ class Animal(pygame.sprite.Sprite):
                 self.bottle.Start()
 
     def Pet(self):
+        """
+        Rozpoczyna akcję głaskania zwierzaka.
+
+        Ustawia animację "pet", zwiększa poziom nudy o 10 i inicjuje animację serc.
+        Akcja jest wykonywana tylko, jeśli zwierzak nie jest już w innej akcji.
+        """
         if not self.inAction:
             self.inAction = True
             self.currentAnimationKey = "pet"
@@ -76,14 +125,32 @@ class Animal(pygame.sprite.Sprite):
                 self.heart = Action(self, chosenHeart[1], self.y * 0.65, f"heart_{chosenHeart[0]}_")
                 self.heart.Start()
 
-    def CheckBoredomAndFood(self):
+    def CheckBoredomAndFood(self) -> bool:
+        """
+        Sprawdza, czy poziomy głodu i nudy zwierzaka są większe od zera.
+
+        :returns: True, jeśli zarówno głód, jak i nuda są większe od 0, w przeciwnym razie False.
+        :rtype: bool
+        """
         return self.boredom > 0 and self.food > 0
 
     def ReduceBoredomAndFood(self):
+        """
+        Zmniejsza poziomy głodu i nudy zwierzaka w oparciu o ich szybkości spadku.
+        """
         self.boredom -= self.boredomSpeed * 0.001
         self.food -= self.hungerSpeed * 0.001
 
-    def Update(self, screen):
+    def Update(self, screen: pygame.Surface):
+        """
+        Aktualizuje stan zwierzaka, w tym jego ruch, animacje oraz stany głodu i nudy.
+
+        Zarządza logiką ruchu (stanie/chodzenie), zmianą kierunku,
+        aktualizacją klatek animacji oraz obsługą animacji akcji (jedzenie/głaskanie).
+
+        :param screen: Powierzchnia Pygame, potrzebna do sprawdzenia granic ekranu dla ruchu.
+        :type screen: pygame.Surface
+        """
         now = pygame.time.get_ticks()
         if not self.inAction:
             if self.move:
@@ -137,7 +204,20 @@ class Animal(pygame.sprite.Sprite):
         if self.heart:
             self.heart.Update()
 
-    def Draw(self, screen, side, scale=1):
+    def Draw(self, screen: pygame.Surface, side: str, scale: float = 1.0):
+        """
+        Rysuje zwierzaka na ekranie.
+
+        Skaluje aktualną klatkę animacji i opcjonalnie odwraca ją w zależności od kierunku
+        (lewo/prawo). Rysuje również aktywne animacje butelek/serc.
+
+        :param screen: Powierzchnia Pygame, na której ma zostać narysowany zwierzak.
+        :type screen: pygame.Surface
+        :param side: Kierunek, w którym zwierzak jest zwrócony dla celów odwrócenia grafiki ("right" lub "left").
+        :type side: str
+        :param scale: Współczynnik skalowania obrazu zwierzaka. Domyślnie 1.0.
+        :type scale: float
+        """
         scaledImage = pygame.transform.scale(self.image,
                                              (screen.get_width() * 0.25 * scale, screen.get_height() * 0.5 * scale))
         scaledRect = scaledImage.get_rect(center=self.rect.center)
