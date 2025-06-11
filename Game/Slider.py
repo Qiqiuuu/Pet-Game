@@ -20,6 +20,7 @@ class Slider:
         self.y = y
         self.width = width
         self.height = height
+        self.offsetX = 0
 
         self.minVal = 0
         self.maxVal = 100
@@ -78,8 +79,10 @@ class Slider:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1 and self.rectHandle.collidepoint(event.pos):
                 self.dragging = True
+                self.offsetX = event.pos[0] - self.rectHandle.left
             else:
                 self.dragging = False
+                self.offsetX = 0
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
                 self.dragging = False
@@ -99,9 +102,8 @@ class Slider:
 
             if self.dragging:
                 self.handlePos = max(self.rectSlider.left,
-                                     min(event.pos[0], self.rectSlider.right - self.rectHandle.width))
-                self.rectHandle = pygame.Rect(self.handlePos, self.y - self.height / 2,
-                                              self.handle.get_width(), self.handle.get_height())
+                                     min(event.pos[0]-self.offsetX, self.rectSlider.right - self.rectHandle.width))
+                self.rectHandle.x = self.handlePos
 
                 proportion = (self.handlePos - self.rectSlider.left) / (self.rectSlider.width - self.rectHandle.width)
                 proportion = max(0.0, min(proportion, 1.0))
